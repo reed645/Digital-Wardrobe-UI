@@ -1,0 +1,33 @@
+{
+  "styles": ["Casual", "Minimal", "Cute", "Sporty", "Street", "Elegant", "Vintage", "Formal"],
+  "categories": ["Top", "Bottom", "Outerwear", "Shoes", "Accessories", "Dress"],
+  "seasons": ["Spring", "Summer", "Autumn", "Winter"],
+  "colors": [
+    { "name": "Black", "hex": "#1A1A1A" },
+    { "name": "White", "hex": "#FFFFFF", "light": true },
+    { "name": "Gray", "hex": "#9CA3AF" },
+    { "name": "Beige", "hex": "#D4BFA0" },
+    { "name": "Brown", "hex": "#92400E" },
+    { "name": "Navy", "hex": "#1E3A5F" },
+    { "name": "Blue", "hex": "#3B82F6" },
+    { "name": "Red", "hex": "#EF4444" },
+    { "name": "Pink", "hex": "#F472B6" },
+    { "name": "Green", "hex": "#22C55E" },
+    { "name": "Multi", "hex": "#C084FC" },
+    { "name": "Yellow", "hex": "#FDE047" }
+  ],
+  "tones": [
+    {
+      "name": "Neutral Tone",
+      "colors": ["Black", "White", "Gray", "Beige", "Brown"]
+    },
+    {
+      "name": "Cool Tone",
+      "colors": ["Navy", "Blue", "Green", "Purple"]
+    },
+    {
+      "name": "Warm Tone",
+      "colors": ["Red", "Pink", "Yellow"]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "calendar": {
+    "year": 2026,
+    "todayDate": "2026-05-14",
+    "yesterdayDate": "2026-05-13"
+  },
+  "months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+}

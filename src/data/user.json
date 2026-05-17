@@ -1,0 +1,22 @@
+{
+  "profile": {
+    "name": "Sarah Chen",
+    "email": "sarah.chen@email.com",
+    "avatarImage": "ChatGPT_Image_2026_5_13__17_27_04.png",
+    "measurements": {
+      "height": "165",
+      "bust": "88",
+      "waist": "68",
+      "hips": "94"
+    },
+    "bodyType": "Rectangle",
+    "stylePreferences": ["Casual", "Minimal", "Street", "Sporty"]
+  },
+  "bodyTypes": [
+    { "key": "Rectangle", "label": "Rectangle", "image": "image-1.png" },
+    { "key": "Hourglass", "label": "Hourglass", "image": "image-2.png" },
+    { "key": "Pear", "label": "Pear", "image": "image-3.png" },
+    { "key": "Apple", "label": "Apple", "image": "image-4.png" },
+    { "key": "Inverted", "label": "Inverted", "image": "image-5.png" }
+  ]
+}

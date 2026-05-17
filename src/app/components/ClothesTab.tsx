@@ -262,10 +262,21 @@ function ItemEditForm({ initial, onSave, onBack, title='AI Detected', itemImage 
 }
 
 /* ─── Item detail page ───────────────────────────────────────────── */
-function ItemDetailView({ item, onBack, onEdit }: {
-  item:ClothingItem; onBack:()=>void; onEdit:()=>void;
+function ItemDetailView({ item, onBack, onEdit, forceLongAgo }: {
+  item:ClothingItem; onBack:()=>void; onEdit:()=>void; forceLongAgo?:boolean;
 }) {
-  const daysAgo = (item.id.charCodeAt(0) % 14) + 1;
+  const getLastWornText = () => {
+    if (forceLongAgo || !item.lastWorn) return '90+ days';
+    const lastWornDate = new Date(item.lastWorn);
+    const today = new Date('2026-05-17');
+    const diffTime = today.getTime() - lastWornDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays >= 90) return '90+ days';
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return '1d ago';
+    return `${diffDays}d ago`;
+  };
+  const lastWornText = getLastWornText();
   return (
     <div className="absolute inset-0 z-30 flex flex-col overflow-hidden" style={{background:PAGE_BG,fontFamily:"'DM Sans',sans-serif"}}>
       <div className="flex items-center justify-between px-4 pt-12 pb-4">
@@ -299,7 +310,7 @@ function ItemDetailView({ item, onBack, onEdit }: {
         {/* Stats */}
         <div className="grid grid-cols-2 gap-2.5 mb-5">
           {[{label:'Times Worn',value:`${item.wearCount}×`,color:'#3D35A8',bg:'#F0EEFF'},
-            {label:'Last Worn', value:`${daysAgo}d ago`,   color:'#7F77DD',bg:'white'}
+            {label:'Last Worn', value: lastWornText,   color:'#7F77DD',bg:'white'}
           ].map(s=>(
             <div key={s.label} className="rounded-2xl p-4" style={{background:s.bg,border:CARD_BORDER}}>
               <p style={{fontSize:10,color:'#AFA9EC',fontWeight:600}}>{s.label}</p>
@@ -390,6 +401,8 @@ export default function ClothesTab() {
   if(activeFilters.sortBy==='least_worn') items=[...items].sort((a,b)=>a.wearCount-b.wearCount);
 
   const totalActiveFilters=activeFilters.colors.length+activeFilters.seasons.length+activeFilters.styles.length+(activeFilters.sortBy?1:0);
+
+  const idleItemIds = new Set([...allItems].sort((a,b)=>a.wearCount-b.wearCount).slice(0,6).map(i=>i.id));
 
   function handleSaveNewItem(d: ItemFormData) {
     const newItem: ClothingItem = {
@@ -549,7 +562,8 @@ export default function ClothesTab() {
       {/* Item detail */}
       {selectedItemId&&selectedItem&&!editingItemId&&(
         <ItemDetailView item={selectedItem} onBack={()=>setSelectedItemId(null)}
-          onEdit={()=>setEditingItemId(selectedItem.id)}/>
+          onEdit={()=>setEditingItemId(selectedItem.id)}
+          forceLongAgo={idleItemIds.has(selectedItem.id)}/>
       )}
 
       {/* Item edit */}

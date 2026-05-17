@@ -36,6 +36,7 @@ export interface ClothingItem {
   colorHex: string;
   comment: string;
   wearCount: number;
+  lastWorn?: string;   // ISO date string, e.g. "2026-05-10"
   styles: string[];
   seasons: string[];
   image?: string;
@@ -44,34 +45,34 @@ export interface ClothingItem {
 
 const INITIAL_WARDROBE: ClothingItem[] = [
   /* ── Tops ─────────────────────────────────────────────────────────── */
-  { id:'t1', closetId:'C001', name:'White Shirt',     type:'Top', color:'White', colorHex:'#F5F5F5', comment:'', wearCount:7,  styles:['Casual','Minimal'],   seasons:['Spring','Summer'],       image:imgWhiteShirt,   emoji:'👕' },
-  { id:'t2', closetId:'C002', name:'Wool Sweater',    type:'Top', color:'Beige', colorHex:'#D4BFA0', comment:'', wearCount:4,  styles:['Casual','Minimal'],   seasons:['Autumn','Winter'],       image:imgWoolSweater,  emoji:'🧥' },
-  { id:'t3', closetId:'C003', name:'Oxford Shirt',    type:'Top', color:'Blue',  colorHex:'#93C5FD', comment:'', wearCount:5,  styles:['Elegant','Minimal'],  seasons:['Spring','Autumn'],       image:imgShirt,        emoji:'👔' },
-  { id:'t4', closetId:'C004', name:'Green Hoodie',    type:'Top', color:'Green', colorHex:'#4ADE80', comment:'', wearCount:3,  styles:['Casual','Sporty'],    seasons:['Autumn','Winter'],       image:imgGreenHoodie,  emoji:'🧥' },
-  { id:'t6', closetId:'C023', name:'Blue Sweater',    type:'Top', color:'Blue',  colorHex:'#4A90D9', comment:'', wearCount:0,  styles:['Casual','Minimal'],   seasons:['Autumn','Winter'],       image:imgBlueSweater,  emoji:'👕' },
-  { id:'t5', closetId:'C005', name:'Black Hoodie',    type:'Top', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:6,  styles:['Casual','Street'],    seasons:['Autumn','Winter'],       image:imgBlackHoodie,  emoji:'🧥' },
+  { id:'t1', closetId:'C001', name:'White Shirt',     type:'Top', color:'White', colorHex:'#F5F5F5', comment:'', wearCount:7,  lastWorn:'2026-05-10', styles:['Casual','Minimal'],   seasons:['Spring','Summer'],       image:imgWhiteShirt,   emoji:'👕' },
+  { id:'t2', closetId:'C002', name:'Wool Sweater',    type:'Top', color:'Beige', colorHex:'#D4BFA0', comment:'', wearCount:4,  lastWorn:'2026-05-05', styles:['Casual','Minimal'],   seasons:['Autumn','Winter'],       image:imgWoolSweater,  emoji:'🧥' },
+  { id:'t3', closetId:'C003', name:'White Shirt',    type:'Top', color:'White', colorHex:'#F5F5F5', comment:'', wearCount:5,  lastWorn:'2026-05-08', styles:['Elegant','Minimal'],  seasons:['Spring','Autumn'],       image:imgShirt,        emoji:'👔' },
+  { id:'t4', closetId:'C004', name:'Green Hoodie',    type:'Top', color:'Green', colorHex:'#4ADE80', comment:'', wearCount:3,  lastWorn:'2025-12-01', styles:['Casual','Sporty'],    seasons:['Autumn','Winter'],       image:imgGreenHoodie,  emoji:'🧥' },
+  { id:'t6', closetId:'C023', name:'Blue Sweater',    type:'Top', color:'Blue',  colorHex:'#4A90D9', comment:'', wearCount:0,  lastWorn:'2025-10-15', styles:['Casual','Minimal'],   seasons:['Autumn','Winter'],       image:imgBlueSweater,  emoji:'👕' },
+  { id:'t5', closetId:'C005', name:'Black Hoodie',    type:'Top', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:6,  lastWorn:'2026-05-12', styles:['Casual','Street'],    seasons:['Autumn','Winter'],       image:imgBlackHoodie,  emoji:'🧥' },
   /* ── Bottoms ───────────────────────────────────────────────────────── */
-  { id:'b1', closetId:'C006', name:'Khaki Shorts',    type:'Bottom', color:'Beige', colorHex:'#C8B89A', comment:'', wearCount:4,  styles:['Casual'],             seasons:['Spring','Summer'],   image:imgShortPants,   emoji:'🩳' },
-  { id:'b2', closetId:'C007', name:'Denim Shorts',    type:'Bottom', color:'Blue',  colorHex:'#5B8DB8', comment:'', wearCount:6,  styles:['Casual','Street'],    seasons:['Spring','Summer'],   image:imgShortJeans,   emoji:'🩳' },
-  { id:'b3', closetId:'C008', name:'Black Trousers',  type:'Bottom', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:8,  styles:['Elegant','Minimal'],  seasons:['Spring','Autumn'],   image:imgPant,         emoji:'👖' },
-  { id:'b4', closetId:'C009', name:'Dark Wash Jeans', type:'Bottom', color:'Navy',  colorHex:'#2C3E6B', comment:'', wearCount:11, styles:['Casual','Minimal'],   seasons:['Autumn','Winter'],   image:imgJeansTrouser, emoji:'👖' },
-  { id:'c020', closetId:'C020', name:'Blue Jeans',      type:'Bottom',    color:'Blue',  colorHex:'#5B8DB8', comment:'', wearCount:0,  styles:['Casual'],             seasons:['Spring','Summer','Autumn'],       image:imgJeans,      emoji:'👖' },
-  { id:'c021', closetId:'C021', name:'Black Cargo Pants',type:'Bottom',    color:'Black', colorHex:'#2C2C2C', comment:'', wearCount:0,  styles:['Casual','Street'],    seasons:['Spring','Summer','Autumn','Winter'], image:imgCargoPants, emoji:'👖' },
+  { id:'b1', closetId:'C006', name:'Khaki Shorts',    type:'Bottom', color:'Green', colorHex:'#4ADE80', comment:'', wearCount:4,  lastWorn:'2026-04-20', styles:['Casual'],             seasons:['Spring','Summer'],   image:imgShortPants,   emoji:'🩳' },
+  { id:'b2', closetId:'C007', name:'Denim Shorts',    type:'Bottom', color:'Blue',  colorHex:'#5B8DB8', comment:'', wearCount:6,  lastWorn:'2026-04-25', styles:['Casual','Street'],    seasons:['Summer'],   image:imgShortJeans,   emoji:'🩳' },
+  { id:'b3', closetId:'C008', name:'Beige Trousers',  type:'Bottom', color:'Beige', colorHex:'#D4BFA0', comment:'', wearCount:8,  lastWorn:'2026-05-11', styles:['Elegant','Minimal'],  seasons:['Spring','Autumn'],   image:imgPant,         emoji:'👖' },
+  { id:'b4', closetId:'C009', name:'Dark Wash Jeans', type:'Bottom', color:'Navy',  colorHex:'#2C3E6B', comment:'', wearCount:11, lastWorn:'2026-05-14', styles:['Casual','Minimal'],   seasons:['Autumn','Winter'],   image:imgJeansTrouser, emoji:'👖' },
+  { id:'c020', closetId:'C020', name:'Blue Jeans',      type:'Bottom',    color:'Blue',  colorHex:'#5B8DB8', comment:'', wearCount:1,  lastWorn:'2025-11-20', styles:['Casual'],             seasons:['Spring','Summer','Autumn'],       image:imgJeans,      emoji:'👖' },
+  { id:'c021', closetId:'C021', name:'Black Cargo Pants',type:'Bottom',    color:'Black', colorHex:'#2C2C2C', comment:'', wearCount:1,  lastWorn:'2025-12-15', styles:['Casual','Street'],    seasons:['Spring','Summer','Autumn','Winter'], image:imgCargoPants, emoji:'👖' },
   /* ── Shoes ────────────────────────────────────────────────────────── */
-  { id:'s1', closetId:'C010', name:'Running Shoes',   type:'Shoes', color:'White', colorHex:'#F5F5F5', comment:'', wearCount:9,  styles:['Sporty'],             seasons:['Spring','Summer'],   image:imgRunningShoes,  emoji:'👟' },
-  { id:'s2', closetId:'C011', name:'Army Boots',      type:'Shoes', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:5,  styles:['Street','Casual'],    seasons:['Autumn','Winter'],   image:imgArmyBoots,     emoji:'🥾' },
-  { id:'s3', closetId:'C012', name:'White Sneakers',  type:'Shoes', color:'White', colorHex:'#F5F5F5', comment:'', wearCount:12, styles:['Casual','Minimal'],   seasons:['Spring','Summer'],   image:imgWhiteSneakers, emoji:'👟' },
-  { id:'s4', closetId:'C013', name:'Black Heels',     type:'Shoes', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:4,  styles:['Elegant'],            seasons:['Spring','Autumn'],   image:imgBlackShoe,     emoji:'👠' },
+  { id:'s1', closetId:'C010', name:'Running Shoes',   type:'Shoes', color:'White', colorHex:'#F5F5F5', comment:'', wearCount:9,  lastWorn:'2026-05-09', styles:['Sporty'],             seasons:['Spring','Summer'],   image:imgRunningShoes,  emoji:'👟' },
+  { id:'s2', closetId:'C011', name:'Army Boots',      type:'Shoes', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:5,  lastWorn:'2026-04-28', styles:['Street','Casual'],    seasons:['Autumn','Winter'],   image:imgArmyBoots,     emoji:'🥾' },
+  { id:'s3', closetId:'C012', name:'White Sneakers',  type:'Shoes', color:'White', colorHex:'#F5F5F5', comment:'', wearCount:12, lastWorn:'2026-05-15', styles:['Casual','Minimal'],   seasons:['Spring','Summer'],   image:imgWhiteSneakers, emoji:'👟' },
+  { id:'s4', closetId:'C013', name:'Black Heels',     type:'Shoes', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:4,  lastWorn:'2026-04-18', styles:['Elegant'],            seasons:['Spring','Autumn'],   image:imgBlackShoe,     emoji:'👠' },
   /* ── Accessories ──────────────────────────────────────────────────── */
-  { id:'a1', closetId:'C014', name:'Love Pendant',    type:'Accessories', color:'Gold',  colorHex:'#D4AF37', comment:'', wearCount:6,  styles:['Elegant','Cute'],     seasons:['Spring','Summer','Autumn','Winter'], image:imgPendant,    emoji:'📿' },
-  { id:'a2', closetId:'C015', name:'Black Scarf',     type:'Accessories', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:8,  styles:['Casual','Minimal'],   seasons:['Autumn','Winter'],                  image:imgBlackScarf, emoji:'🧣' },
-  { id:'a3', closetId:'C016', name:'Ladies Handbag',  type:'Accessories', color:'Beige', colorHex:'#D4BFA0', comment:'', wearCount:10, styles:['Elegant','Minimal'],  seasons:['Spring','Summer'],                  image:imgHandBag,    emoji:'👜' },
-  { id:'a4', closetId:'C017', name:'Black Bag',       type:'Accessories', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:7,  styles:['Street','Elegant'],   seasons:['Autumn','Winter'],                  image:imgBlackBag,   emoji:'👜' },
-  { id:'a5', closetId:'C024', name:'Shopping Bag',   type:'Accessories', color:'Tan',   colorHex:'#C8A96E', comment:'', wearCount:0,  styles:['Casual','Minimal'],   seasons:['Spring','Summer'],                  image:imgShoppingBag, emoji:'👜' },
+  { id:'a1', closetId:'C014', name:'Love Pendant',    type:'Accessories', color:'Gold',  colorHex:'#D4AF37', comment:'', wearCount:6,  lastWorn:'2026-05-06', styles:['Elegant','Cute'],     seasons:['Spring','Summer','Autumn','Winter'], image:imgPendant,    emoji:'📿' },
+  { id:'a2', closetId:'C015', name:'Black Scarf',     type:'Accessories', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:8,  lastWorn:'2026-02-10', styles:['Casual','Minimal'],   seasons:['Autumn','Winter'],                  image:imgBlackScarf, emoji:'🧣' },
+  { id:'a3', closetId:'C016', name:'Ladies Handbag',  type:'Accessories', color:'Beige', colorHex:'#D4BFA0', comment:'', wearCount:10, lastWorn:'2026-05-13', styles:['Elegant','Minimal'],  seasons:['Spring','Summer'],                  image:imgHandBag,    emoji:'👜' },
+  { id:'a4', closetId:'C017', name:'Black Bag',       type:'Accessories', color:'Black', colorHex:'#1A1A1A', comment:'', wearCount:7,  lastWorn:'2026-05-07', styles:['Street','Elegant'],   seasons:['Autumn','Winter'],                  image:imgBlackBag,   emoji:'👜' },
+  { id:'a5', closetId:'C024', name:'Shopping Bag',   type:'Accessories', color:'Tan',   colorHex:'#C8A96E', comment:'', wearCount:1,  lastWorn:'2025-11-05', styles:['Casual','Minimal'],   seasons:['Spring','Summer'],                  image:imgShoppingBag, emoji:'👜' },
   /* ── Outerwear ────────────────────────────────────────────────────── */
-  { id:'o1', closetId:'C018', name:'White Fur Coat',  type:'Outerwear', color:'White', colorHex:'#F5F5F5', comment:'', wearCount:3,  styles:['Elegant','Cute'],     seasons:['Winter'],            image:imgFurCoat,    emoji:'🧥' },
-  { id:'o2', closetId:'C019', name:'Brown Coat',      type:'Outerwear', color:'Brown', colorHex:'#92400E', comment:'', wearCount:5,  styles:['Casual','Minimal'],   seasons:['Autumn','Winter'],   image:imgBrownCoat,  emoji:'🧥' },
-  { id:'o3', closetId:'C022', name:'Blue Jacket',     type:'Outerwear', color:'Blue',  colorHex:'#3B82F6', comment:'', wearCount:0,  styles:['Casual','Street'],    seasons:['Spring','Autumn'],   image:imgFourPocketJacket, emoji:'🧥' },
+  { id:'o1', closetId:'C018', name:'White Fur Coat',  type:'Outerwear', color:'White', colorHex:'#F5F5F5', comment:'', wearCount:3,  lastWorn:'2026-01-20', styles:['Elegant','Cute'],     seasons:['Winter'],            image:imgFurCoat,    emoji:'🧥' },
+  { id:'o2', closetId:'C019', name:'White Suit',      type:'Outerwear', color:'White', colorHex:'#F5F5F5', comment:'', wearCount:5,  lastWorn:'2026-04-22', styles:['Casual','Minimal'],   seasons:['Autumn','Winter'],   image:imgBrownCoat,  emoji:'🧥' },
+  { id:'o3', closetId:'C022', name:'Blue Jacket',     type:'Outerwear', color:'Blue',  colorHex:'#3B82F6', comment:'', wearCount:0,  lastWorn:'2025-10-01', styles:['Casual','Street'],    seasons:['Spring','Autumn'],   image:imgFourPocketJacket, emoji:'🧥' },
 ];
 
 let items: ClothingItem[] = [...INITIAL_WARDROBE];

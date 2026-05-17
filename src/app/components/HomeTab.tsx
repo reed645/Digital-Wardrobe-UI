@@ -115,6 +115,19 @@ function ItemPhotoTile({ emoji, colorHex, badge, badgeColor, image, onClick }: {
 
 /* ─── Item detail bottom sheet (Health Report) ───────────────────── */
 function ItemDetailSheet({ item, onClose }: { item: ClothingItem; onClose: () => void }) {
+  const getLastWornText = () => {
+    if (!item.lastWorn) return '90+ days';
+    const lastWornDate = new Date(item.lastWorn);
+    const today = new Date('2026-05-17');
+    const diffTime = today.getTime() - lastWornDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays >= 90) return '90+ days';
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return '1d ago';
+    return `${diffDays}d ago`;
+  };
+  const lastWornText = getLastWornText();
+
   return (
     <div className="absolute inset-0 z-50 flex flex-col justify-end"
       style={{ background:'rgba(26,21,96,0.35)' }} onClick={onClose}>
@@ -154,6 +167,10 @@ function ItemDetailSheet({ item, onClose }: { item: ClothingItem; onClose: () =>
               <div style={{ width:12, height:12, borderRadius:'50%', background:item.colorHex, border:'1.5px solid #EEEDFE' }}/>
               <p style={{ fontSize:13, fontWeight:600, color:'#1a1560' }}>{item.color}</p>
             </div>
+          </div>
+          <div className="rounded-xl px-3 py-2 flex-1" style={{ background:'#F8F7FF', border:CARD_BORDER }}>
+            <p style={{ fontSize:9, fontWeight:700, color:'#AFA9EC', textTransform:'uppercase', letterSpacing:'0.06em' }}>Last Worn</p>
+            <p style={{ fontSize:13, fontWeight:600, color:'#1a1560', marginTop:2 }}>{lastWornText}</p>
           </div>
           <div className="rounded-xl px-3 py-2 flex-1" style={{ background:'#F8F7FF', border:CARD_BORDER }}>
             <p style={{ fontSize:9, fontWeight:700, color:'#AFA9EC', textTransform:'uppercase', letterSpacing:'0.06em' }}>Worn</p>
@@ -395,7 +412,7 @@ export default function HomeTab() {
         </h1>
         <p style={{fontSize:14,color:'#7F77DD',marginTop:4}}>What to wear today?</p>
         <div className="flex gap-2.5 mt-4">
-          {[`${totalItems} items`,'23 outfits'].map(lbl=>(
+          {[`${totalItems} items`,'3 outfits'].map(lbl=>(
             <span key={lbl} style={{border:'1px solid #AFA9EC',borderRadius:999,
               padding:'5px 14px',fontSize:13,color:'#3D35A8',fontWeight:500,background:'white'}}>{lbl}</span>
           ))}

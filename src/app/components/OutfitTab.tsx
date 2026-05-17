@@ -2830,13 +2830,6 @@ export default function OutfitTab() {
                     {selectedDayOutfits.length} / 3
                   </p>
                 </div>
-                {selectedDayOutfits.length < 3 && (
-                  <button onClick={() => openCreate(calSelectedDate)}
-                    className="flex items-center gap-1.5 rounded-full px-3 py-2"
-                    style={{ background:'#3D35A8', color:'white', fontSize:12, fontWeight:600 }}>
-                    <Plus size={13}/> Add outfit
-                  </button>
-                )}
               </div>
 
               {selectedDayOutfits.length === 0 ? (

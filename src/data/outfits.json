@@ -1,0 +1,70 @@
+{
+  "outfits": [
+    {
+      "id": "O001",
+      "date": "2026-05-02",
+      "style": "Casual",
+      "label": "2 May Outfit",
+      "mannequinImage": "file_00000000ac6c7206b0ffc4af338ca472.png",
+      "avatarImage": "file_000000009b4c7207acc65bca74088e0b.png",
+      "outfitItems": [
+        { "id": "t6", "type": "Top", "emoji": "👕", "color": "Blue", "colorHex": "#4A90D9", "image": "blue_sweater-1.png", "name": "Blue Sweater" },
+        { "id": "b3", "type": "Bottom", "emoji": "👖", "color": "Black", "colorHex": "#1A1A1A", "image": "pant.png", "name": "Black Trousers" },
+        { "id": "s2", "type": "Shoes", "emoji": "🥾", "color": "Black", "colorHex": "#1A1A1A", "image": "Black_army_Boots.png", "name": "Army Boots" },
+        { "id": "a5", "type": "Accessories", "emoji": "👜", "color": "Tan", "colorHex": "#C8A96E", "image": "Shopping_Bag-1.png", "name": "Shopping Bag" }
+      ]
+    },
+    {
+      "id": "O002",
+      "date": "2026-05-06",
+      "style": "Casual",
+      "label": "6 May Outfit",
+      "mannequinImage": "file_000000004d3c71fa83b0fc076565130c.png",
+      "avatarImage": "file_00000000dad472098b367017fe90c1df.png",
+      "outfitItems": [
+        { "id": "t4", "type": "Top", "emoji": "🧥", "color": "Green", "colorHex": "#4ADE80", "image": "Cozy_green_hoodie.png", "name": "Green Hoodie" },
+        { "id": "c020", "type": "Bottom", "emoji": "👖", "color": "Blue", "colorHex": "#5B8DB8", "image": "jeans.png", "name": "Blue Jeans" },
+        { "id": "s1", "type": "Shoes", "emoji": "👟", "color": "White", "colorHex": "#F5F5F5", "image": "Running_Shoes.png", "name": "Running Shoes" }
+      ]
+    },
+    {
+      "id": "O003",
+      "date": "2026-05-09",
+      "style": "Casual",
+      "label": "9 May Outfit",
+      "mannequinImage": "file_00000000fa48720981ed96a40f5d5d67.png",
+      "avatarImage": "file_000000000d7c7206badf63333abfad20.png",
+      "outfitItems": [
+        { "id": "t3", "type": "Top", "emoji": "👔", "color": "Blue", "colorHex": "#93C5FD", "image": "shirt.png", "name": "Oxford Shirt" },
+        { "id": "o3", "type": "Outerwear", "emoji": "🧥", "color": "Blue", "colorHex": "#3B82F6", "image": "Four_Pocket_Jacket.png", "name": "Blue Jacket" },
+        { "id": "c021", "type": "Bottom", "emoji": "👖", "color": "Black", "colorHex": "#2C2C2C", "image": "Stylish_Olive_Cargo_Pants_with_Multiple_Pockets.png", "name": "Black Cargo Pants" },
+        { "id": "s3", "type": "Shoes", "emoji": "👟", "color": "White", "colorHex": "#F5F5F5", "image": "White_Sneakers.jpg", "name": "White Sneakers" },
+        { "id": "a4", "type": "Accessories", "emoji": "👜", "color": "Black", "colorHex": "#1A1A1A", "image": "Black_Women_Bag.png", "name": "Black Bag" }
+      ]
+    }
+  ],
+  "collections": [
+    {
+      "id": "COL001",
+      "name": "Melbourne Trip",
+      "purpose": "Travel",
+      "dateFrom": "2026-05-02",
+      "dateTo": "2026-05-06",
+      "outfitIds": ["O001", "O002"]
+    },
+    {
+      "id": "COL002",
+      "name": "Work Week",
+      "purpose": "Work Week",
+      "dateFrom": "2026-05-12",
+      "dateTo": "2026-05-16",
+      "outfitIds": ["O003"]
+    },
+    {
+      "id": "COL003",
+      "name": "Formal Events",
+      "purpose": "Formal",
+      "outfitIds": []
+    }
+  ]
+}
