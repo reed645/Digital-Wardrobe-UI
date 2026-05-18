@@ -4,8 +4,9 @@ import { toast } from 'sonner';
 import clothingPreview from '../../imports/image.png';
 import FilterSheet, { FilterState } from './FilterSheet';
 import { getStyles, addStyle, subscribeStyles } from '../store/styleTags';
-import { getItems, addItem as storeAddItem, updateItem as storeUpdateItem, removeItem as storeRemoveItem, subscribeWardrobe, getNextClosetId, ClothingItem } from '../store/wardrobe';
-import { getCategories, getColorPalette, getSeasons } from '../../data/index';
+import { getItems, addItem as storeAddItem, updateItem as storeUpdateItem, removeItem as storeRemoveItem, subscribeWardrobe, getNextClosetId, ClothingItem, markAsWorn } from '../store/wardrobe';
+import { addItemToOutfit, addItemToTodayOutfit, SavedOutfitItem } from '../store/outfits';
+import { getCategories, getColorPalette, getSeasons, getTodayDate } from '../../data/index';
 
 /* ─── Tokens ─────────────────────────────────────────────────────── */
 const PAGE_BG    = '#F8F7FF';
@@ -256,13 +257,14 @@ function ItemEditForm({ initial, onSave, onBack, title='AI Detected', itemImage 
 }
 
 /* ─── Item detail page ───────────────────────────────────────────── */
-function ItemDetailView({ item, onBack, onEdit, forceLongAgo }: {
-  item:ClothingItem; onBack:()=>void; onEdit:()=>void; forceLongAgo?:boolean;
+function ItemDetailView({ item, onBack, onEdit, onMarkWorn, onAddToOutfit, forceLongAgo }: {
+  item:ClothingItem; onBack:()=>void; onEdit:()=>void; onMarkWorn:()=>void; onAddToOutfit:()=>void; forceLongAgo?:boolean;
 }) {
+  const todayStr = getTodayDate();
   const getLastWornText = () => {
     if (forceLongAgo || !item.lastWorn) return '90+ days';
     const lastWornDate = new Date(item.lastWorn);
-    const today = new Date('2026-05-17');
+    const today = new Date(todayStr);
     const diffTime = today.getTime() - lastWornDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     if (diffDays >= 90) return '90+ days';
@@ -342,8 +344,8 @@ function ItemDetailView({ item, onBack, onEdit, forceLongAgo }: {
           </div>
         )}
         <div className="space-y-2.5">
-          <button onClick={() => toast.success("Added to outfit")} className="w-full h-11 rounded-full font-semibold text-sm text-white" style={{background:'#3D35A8'}}>Add to Outfit</button>
-          <button onClick={() => toast.success("Marked as worn today")} className="w-full h-11 rounded-full font-semibold text-sm" style={{background:'white',border:CARD_BORDER,color:'#7F77DD'}}>Mark as Worn Today</button>
+          <button onClick={onAddToOutfit} className="w-full h-11 rounded-full font-semibold text-sm text-white" style={{background:'#3D35A8'}}>Add to Outfit</button>
+          <button onClick={onMarkWorn} className="w-full h-11 rounded-full font-semibold text-sm" style={{background:'white',border:CARD_BORDER,color:'#7F77DD'}}>Mark as Worn Today</button>
         </div>
       </div>
     </div>
@@ -557,8 +559,27 @@ export default function ClothesTab() {
 
       {/* Item detail */}
       {selectedItemId&&selectedItem&&!editingItemId&&(
-        <ItemDetailView item={selectedItem} onBack={()=>setSelectedItemId(null)}
+        <ItemDetailView 
+          item={selectedItem} 
+          onBack={()=>setSelectedItemId(null)}
           onEdit={()=>setEditingItemId(selectedItem.id)}
+          onMarkWorn={() => {
+            markAsWorn(selectedItem.id, getTodayDate());
+            toast.success("Marked as worn today");
+          }}
+          onAddToOutfit={() => {
+            const outfitItem: SavedOutfitItem = {
+              id: selectedItem.id,
+              type: selectedItem.type,
+              emoji: selectedItem.emoji,
+              color: selectedItem.color,
+              colorHex: selectedItem.colorHex,
+              image: selectedItem.image,
+              name: selectedItem.name,
+            };
+            addItemToTodayOutfit(outfitItem, getTodayDate());
+            toast.success("Added to outfit");
+          }}
           forceLongAgo={idleItemIds.has(selectedItem.id)}/>
       )}
 

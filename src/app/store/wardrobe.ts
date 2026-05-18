@@ -96,6 +96,19 @@ export function getNextClosetId(): string {
   return `C${String(next).padStart(3, '0')}`;
 }
 
+/* ─── Item operations ─────────────────────────────────────────────── */
+export function markAsWorn(id: string, date: string): void {
+  items = items.map(i => {
+    if (i.id !== id) return i;
+    return { ...i, wearCount: i.wearCount + 1, lastWorn: date };
+  });
+  notify();
+}
+
+export function getItemById(id: string): ClothingItem | undefined {
+  return items.find(i => i.id === id);
+}
+
 /* ─── Derived helpers ───────────────────────────────────────────────── */
 export function getItemByClosetId(closetId: string): ClothingItem | undefined {
   return items.find(i => i.closetId === closetId);
