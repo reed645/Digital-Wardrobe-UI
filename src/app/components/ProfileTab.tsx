@@ -1,13 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Settings, Bell, Lock, HelpCircle, LogOut, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
+import { getUserProfile, getBodyTypes } from '../../data/index';
 
 /* ─── Model images (uploaded body-type photos) ───────────────────── */
-import imgRectangle from '../../imports/image-1.png';
-import imgHourglass from '../../imports/image-2.png';
-import imgPear       from '../../imports/image-3.png';
-import imgApple      from '../../imports/image-4.png';
-import imgInverted   from '../../imports/image-5.png';
+// Body type images are loaded via getBodyTypes() with resolved URLs
 
 /* ─── Tokens ─────────────────────────────────────────────────────── */
 const PAGE_BG     = '#F8F7FF';
@@ -15,14 +12,9 @@ const CARD_BORDER = '1px solid #EEEDFE';
 const DM          = { fontFamily:"'DM Sans',sans-serif" };
 const LABEL_STYLE = { fontSize:11, color:'#AFA9EC', fontWeight:600 as const, letterSpacing:'0.08em', textTransform:'uppercase' as const };
 
-/* ─── Avatar config ──────────────────────────────────────────────── */
-const BODY_TYPES: { key:string; label:string; image:string }[] = [
-  { key:'Rectangle', label:'Rectangle',  image: imgRectangle },
-  { key:'Hourglass', label:'Hourglass',  image: imgHourglass },
-  { key:'Pear',      label:'Pear',       image: imgPear      },
-  { key:'Apple',     label:'Apple',      image: imgApple     },
-  { key:'Inverted',  label:'Inverted',   image: imgInverted  },
-];
+/* ─── Data from data layer ────────────────────────────────────────── */
+const userProfile = getUserProfile();
+const bodyTypes = getBodyTypes();
 
 /* ─── Section label ──────────────────────────────────────────────── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -73,13 +65,13 @@ function MeasureInput({ label, value, unit, onChange }:{
 /* ─── Main ProfileTab ────────────────────────────────────────────── */
 export default function ProfileTab() {
   const [activeTab,    setActiveTab]    = useState<'avatar'|'settings'>('avatar');
-  const [bodyType,     setBodyType]     = useState('Rectangle');
-  const [height,       setHeight]       = useState('165');
-  const [bust,         setBust]         = useState('88');
-  const [waist,        setWaist]        = useState('68');
-  const [hips,         setHips]         = useState('94');
+  const [bodyType,     setBodyType]     = useState(userProfile.bodyType);
+  const [height,       setHeight]       = useState(userProfile.measurements.height);
+  const [bust,         setBust]         = useState(userProfile.measurements.bust);
+  const [waist,        setWaist]        = useState(userProfile.measurements.waist);
+  const [hips,         setHips]         = useState(userProfile.measurements.hips);
 
-  const selectedBodyType = BODY_TYPES.find(b => b.key === bodyType) ?? BODY_TYPES[0];
+  const selectedBodyType = bodyTypes.find(b => b.key === bodyType) ?? bodyTypes[0];
 
   return (
     <div className="h-full overflow-y-auto" style={{background:PAGE_BG,...DM}}>
@@ -89,9 +81,9 @@ export default function ProfileTab() {
         <p style={LABEL_STYLE}>Profile</p>
         <h1 style={{fontFamily:"'Playfair Display',Georgia,serif",fontStyle:'italic',
           fontWeight:800,fontSize:40,lineHeight:1.05,color:'#1a1560',letterSpacing:'-0.5px',marginTop:4}}>
-          Sarah Chen
+          {userProfile.name}
         </h1>
-        <p style={{fontSize:13,color:'#7F77DD',marginTop:4}}>sarah.chen@email.com</p>
+        <p style={{fontSize:13,color:'#7F77DD',marginTop:4}}>{userProfile.email}</p>
         <div className="flex gap-2.5 mt-4">
           {['84 items','3 outfits','Jan 2026'].map(lbl=>(
             <span key={lbl} style={{border:'1px solid #AFA9EC',borderRadius:999,
@@ -126,7 +118,7 @@ export default function ProfileTab() {
                 style={{width:150, height:220, background:'white', position:'relative', overflow:'hidden'}}>
                 <img
                   key={selectedBodyType.key}
-                  src={selectedBodyType.image}
+                  src={selectedBodyType.imageUrl ?? selectedBodyType.image}
                   alt={selectedBodyType.label}
                   style={{
                     position:'absolute', inset:0,
@@ -147,7 +139,7 @@ export default function ProfileTab() {
                     Body Type
                   </p>
                   <div className="flex flex-col gap-1.5">
-                    {BODY_TYPES.map(b=>(
+                    {bodyTypes.map(b=>(
                       <button key={b.key} onClick={()=>setBodyType(b.key)}
                         className="h-7 px-2 rounded-lg text-xs font-semibold text-left transition-colors"
                         style={{
@@ -186,7 +178,7 @@ export default function ProfileTab() {
           <SectionLabel>Style preferences</SectionLabel>
           <div className="mx-5 mb-5 bg-white rounded-2xl p-4" style={{border:CARD_BORDER}}>
             <div className="flex flex-wrap gap-2">
-              {['Casual','Minimal','Street','Sporty'].map(s=>(
+              {userProfile.stylePreferences.map(s=>(
                 <span key={s} className="rounded-full px-3 py-1.5 text-sm font-semibold"
                   style={{background:'#EEEDFE',color:'#3D35A8'}}>{s}</span>
               ))}

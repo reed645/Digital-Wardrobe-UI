@@ -5,29 +5,23 @@ import clothingPreview from '../../imports/image.png';
 import FilterSheet, { FilterState } from './FilterSheet';
 import { getStyles, addStyle, subscribeStyles } from '../store/styleTags';
 import { getItems, addItem as storeAddItem, updateItem as storeUpdateItem, removeItem as storeRemoveItem, subscribeWardrobe, getNextClosetId, ClothingItem } from '../store/wardrobe';
+import { getCategories, getColorPalette, getSeasons } from '../../data/index';
 
 /* ─── Tokens ─────────────────────────────────────────────────────── */
 const PAGE_BG    = '#F8F7FF';
 const CARD_BORDER = '1px solid #EEEDFE';
 
-/* ─── Data ───────────────────────────────────────────────────────── */
+/* ─── Data from data layer ───────────────────────────────────────── */
 const CATEGORY_TABS = ['All', 'Tops', 'Bottoms', 'Outerwear', 'Shoes', 'Accessories'];
 const CATEGORY_MAP: Record<string, string[]> = {
   Tops: ['Top'], Bottoms: ['Bottom'], Outerwear: ['Outerwear'],
   Shoes: ['Shoes'], Accessories: ['Accessories'],
 };
 
-/* ─── Scan data ──────────────────────────────────────────────────── */
-const SCAN_CATEGORIES = ['Top','Bottom','Outerwear','Shoes','Accessories','Dress'];
-const SCAN_COLORS: { name:string; hex:string; light?:boolean }[] = [
-  { name:'Black', hex:'#1A1A1A' }, { name:'White', hex:'#F5F5F5', light:true },
-  { name:'Gray',  hex:'#9CA3AF' }, { name:'Beige', hex:'#D4BFA0' },
-  { name:'Brown', hex:'#92400E' }, { name:'Navy',  hex:'#1E3A5F' },
-  { name:'Blue',  hex:'#3B82F6' }, { name:'Red',   hex:'#EF4444' },
-  { name:'Pink',  hex:'#F472B6' }, { name:'Green', hex:'#22C55E' },
-  { name:'Multi', hex:'#C084FC' }, { name:'Yellow',hex:'#FDE047' },
-];
-const SCAN_SEASONS  = ['Spring','Summer','Autumn','Winter'];
+/* ─── Scan data from data layer ─────────────────────────────────── */
+const SCAN_CATEGORIES = getCategories();
+const SCAN_COLORS = getColorPalette();
+const SCAN_SEASONS = getSeasons();
 
 /* ─── Source sheet ───────────────────────────────────────────────── */
 function SourceSheet({ onSelect, onClose }: { onSelect:(src:'camera'|'album')=>void; onClose:()=>void }) {
@@ -405,12 +399,13 @@ export default function ClothesTab() {
   const idleItemIds = new Set([...allItems].sort((a,b)=>a.wearCount-b.wearCount).slice(0,6).map(i=>i.id));
 
   function handleSaveNewItem(d: ItemFormData) {
+    const colorEntry = SCAN_COLORS.find(c => c.name === d.colorNames[0]);
     const newItem: ClothingItem = {
       id: Date.now().toString(),
       closetId: getNextClosetId(),
-      name: `${d.category} ${d.colorNames[0]??''}`.trim(),
-      type: d.category, color: d.colorNames[0]??'Multi',
-      colorHex: SCAN_COLORS.find(c=>c.name===d.colorNames[0])?.hex??'#C084FC',
+      name: `${d.category} ${d.colorNames[0] ?? ''}`.trim(),
+      type: d.category, color: d.colorNames[0] ?? 'Multi',
+      colorHex: colorEntry?.hex ?? '#C084FC',
       comment: d.comment, wearCount: 0, styles: d.styles, seasons: d.seasons, emoji: '👕',
     };
     storeAddItem(newItem);
@@ -421,9 +416,10 @@ export default function ClothesTab() {
     if(!editingItemId) return;
     const existing = allItems.find(i => i.id === editingItemId);
     if(!existing) return;
+    const colorEntry = SCAN_COLORS.find(c => c.name === d.colorNames[0]);
     const updated: ClothingItem = { ...existing, type:d.category, styles:d.styles, seasons:d.seasons, comment:d.comment,
-      color:d.colorNames[0]??existing.color,
-      colorHex:SCAN_COLORS.find(c=>c.name===d.colorNames[0])?.hex??existing.colorHex };
+      color:d.colorNames[0] ?? existing.color,
+      colorHex: colorEntry?.hex ?? existing.colorHex };
     storeUpdateItem(updated);
     setEditingItemId(null);
     setSelectedItemId(null);

@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { getStyles, subscribeStyles } from '../store/styleTags';
 import { ClothingItem, getItems, getIdleItems, getRecentItems, subscribeWardrobe } from '../store/wardrobe';
 import { addOutfit, getOutfits, subscribeOutfits, OutfitRecord } from '../store/outfits';
+import { getColorTones, getColorPalette } from '../../data/index';
 
 /* ─── Shared tokens ──────────────────────────────────────────────── */
 const PAGE_BG    = '#F8F7FF';
@@ -413,15 +414,15 @@ function SuggestResultScreen({
   );
 }
 
-/* ─── Preference data ────────────────────────────────────────────── */
-const TONES: { name: string; colors: { name: string; hex: string; light?: boolean }[] }[] = [
-  { name: 'Neutral Tone',
-    colors: [{ name:'Black',hex:'#1A1A1A'},{name:'White',hex:'#F5F5F5',light:true},{name:'Gray',hex:'#9CA3AF'},{name:'Beige',hex:'#D4BFA0'},{name:'Brown',hex:'#92400E'}] },
-  { name: 'Cool Tone',
-    colors: [{name:'Navy',hex:'#1E3A5F'},{name:'Blue',hex:'#3B82F6'},{name:'Green',hex:'#22C55E'},{name:'Purple',hex:'#A855F7'}] },
-  { name: 'Warm Tone',
-    colors: [{name:'Red',hex:'#EF4444'},{name:'Pink',hex:'#F472B6'},{name:'Yellow',hex:'#FDE047'}] },
-];
+/* ─── Preference data from data layer ─────────────────────────────── */
+const colorPalette = getColorPalette();
+const TONES = getColorTones().map(tone => ({
+  name: tone.name,
+  colors: tone.colors.map(colorName => {
+    const colorEntry = colorPalette.find(c => c.name === colorName);
+    return colorEntry ? { name: colorName, hex: colorEntry.hex, light: colorEntry.light } : { name: colorName, hex: '#888888' };
+  })
+}));
 
 /* ─── Main outfit result card ────────────────────────────────────── */
 function OutfitResultCard({ outfit, saved, onSave, onAddToOutfit }: {

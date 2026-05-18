@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { getStyles, subscribeStyles } from '../store/styleTags';
+import { getColorPalette, getSeasons } from '../../data/index';
 
 /* ─── Types ──────────────────────────────────────────────────────── */
 export type SortBy = 'most_worn' | 'least_worn' | null;
@@ -12,24 +13,10 @@ export interface FilterState {
   styles: string[];
 }
 
-/* ─── Data ───────────────────────────────────────────────────────── */
-const COLORS: { name: string; hex: string; light?: boolean }[] = [
-  { name: 'Black',  hex: '#1A1A1A' },
-  { name: 'White',  hex: '#FFFFFF', light: true },
-  { name: 'Gray',   hex: '#9CA3AF' },
-  { name: 'Beige',  hex: '#D4BFA0' },
-  { name: 'Brown',  hex: '#92400E' },
-  { name: 'Navy',   hex: '#1E3A5F' },
-  { name: 'Blue',   hex: '#3B82F6' },
-  { name: 'Green',  hex: '#22C55E' },
-  { name: 'Red',    hex: '#EF4444' },
-  { name: 'Pink',   hex: '#F472B6' },
-  { name: 'Yellow', hex: '#FDE047' },
-  { name: 'Purple', hex: '#A855F7' },
-];
-
-const SEASONS = ['Spring', 'Summer', 'Autumn', 'Winter'];
-const STYLES  = ['Casual', 'Minimal', 'Cute', 'Sporty', 'Street', 'Elegant', 'Vintage', 'Formal'];
+/* ─── Data from data layer ────────────────────────────────────────── */
+const COLORS = getColorPalette();
+const SEASONS = getSeasons();
+const STYLES = getStyles();
 
 /* ─── Grid chip (fills cell evenly) ─────────────────────────────── */
 function GridChip({ label, active, onToggle }: { label: string; active: boolean; onToggle: () => void }) {

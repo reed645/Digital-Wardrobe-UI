@@ -1,13 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, Cloud, ChevronRight, Clock, ArrowLeft, Lightbulb, Repeat2, Star, X, RefreshCw } from 'lucide-react';
-import avatarImg from '../../imports/ChatGPT_Image_2026_5_13__17_27_04.png';
 import { ClothingItem, getItems, subscribeWardrobe } from '../store/wardrobe';
+import { getTodayDate, getUserProfile } from '../../data/index';
 
 /* ─── Tokens ─────────────────────────────────────────────────────── */
 const PAGE_BG     = '#F8F7FF';
 const CARD_BORDER = '1px solid #EEEDFE';
 const LABEL_STYLE = { fontSize: 11, color: '#AFA9EC', fontWeight: 600 as const, letterSpacing: '0.08em', textTransform: 'uppercase' as const };
 const TITLE_FONT  = { fontFamily: "'Playfair Display', Georgia, serif", fontStyle: 'italic' as const };
+
+/* ─── Date formatter ──────────────────────────────────────────────── */
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
 
 /* ─── Donut ──────────────────────────────────────────────────────── */
 const DONUT_R = 44, DONUT_C = 2 * Math.PI * DONUT_R;
@@ -366,6 +373,10 @@ export default function HomeTab() {
   const [weatherSeed, setWeatherSeed] = useState(0);
   useEffect(() => subscribeWardrobe(() => setWardrobeItems(getItems())), []);
 
+  const userProfile = getUserProfile();
+  const todayDate = getTodayDate();
+  const formattedToday = formatDate(todayDate);
+
   if (showHealthDetail) return <HealthDetailView onBack={() => setShowHealthDetail(false)} wardrobeItems={wardrobeItems}/>;
 
   const totalItems = wardrobeItems.length;
@@ -400,11 +411,11 @@ export default function HomeTab() {
         {/* Avatar — further left */}
         <div className="absolute flex items-end justify-center"
           style={{top:52,right:10,width:152,height:152,overflow:'visible',pointerEvents:'none'}}>
-          <img src={avatarImg} alt="avatar"
+          <img src={userProfile.avatarImageUrl ?? userProfile.avatarImage} alt="avatar"
             style={{width:'100%',height:'100%',objectFit:'contain',objectPosition:'bottom right'}}/>
         </div>
         <div className="flex items-center gap-1.5 mb-1">
-          <span style={{fontSize:12,color:'#7F77DD',fontWeight:500}}>May 14, 2026</span>
+          <span style={{fontSize:12,color:'#7F77DD',fontWeight:500}}>{formattedToday}</span>
           <Sparkles size={10} color="#AFA9EC"/>
         </div>
         <h1 style={{...TITLE_FONT,fontWeight:800,fontSize:46,lineHeight:1.05,color:'#1a1560',letterSpacing:'-0.5px'}}>

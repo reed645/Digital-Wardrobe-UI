@@ -15,6 +15,7 @@ import {
   OutfitPlan, PlanDaySlot, getPlans, addPlan, updatePlan, deletePlan,
   subscribePlans, setInitialPlans,
 } from '../store/plans';
+import { getCalendarYear, getTodayDate, getYesterdayDate, getMonthNames, getStyleTags } from '../../data/index';
 
 /* ── May 2 outfit assets ─────────────────────────────────────────── */
 import mannequin_may2  from '../../imports/file_00000000ac6c7206b0ffc4af338ca472.png';
@@ -123,10 +124,11 @@ const PAGE_BG      = '#F8F7FF';
 const CARD_BORDER  = '1px solid #EEEDFE';
 const DM           = { fontFamily:"'DM Sans',sans-serif" };
 const TITLE_FONT   = { fontFamily:"'Playfair Display',Georgia,serif", fontStyle:'italic' as const };
-const CAL_YEAR     = 2026;
-const TODAY_STR    = '2026-05-14';
-const YESTERDAY    = '2026-05-13';
-const STYLES_LIST  = ['Casual','Minimal','Cute','Sport','Formal'] as const;
+const CAL_YEAR     = getCalendarYear();
+const TODAY_STR    = getTodayDate();
+const YESTERDAY    = getYesterdayDate();
+const MONTH_NAMES  = getMonthNames();
+const STYLES_LIST  = getStyleTags();
 const STYLE_FILTERS = ['All', ...STYLES_LIST];
 
 type WardrobeItem = SavedOutfitItem;
@@ -140,8 +142,8 @@ function formatShort(d: string): string {
   return new Date(d + 'T12:00:00').toLocaleDateString('en-AU', { day:'numeric', month:'long' });
 }
 function formatBarDate(d: string): string {
-  if (d === TODAY_STR) return 'Today, 14 May';
-  if (d === YESTERDAY) return 'Yesterday, 13 May';
+  if (d === TODAY_STR) return `Today, ${new Date(TODAY_STR + 'T12:00:00').getDate()} ${MONTH_NAMES[new Date(TODAY_STR + 'T12:00:00').getMonth()]}`;
+  if (d === YESTERDAY) return `Yesterday, ${new Date(YESTERDAY + 'T12:00:00').getDate()} ${MONTH_NAMES[new Date(YESTERDAY + 'T12:00:00').getMonth()]}`;
   return formatDate(d);
 }
 
@@ -546,7 +548,6 @@ function MiniCalendarPicker({
   currentDate, onSelect, onBack,
 }: { currentDate: string; onSelect: (d: string) => void; onBack: () => void }) {
   const [month, setMonth] = useState(4);
-  const MONTHS      = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const firstDay    = new Date(CAL_YEAR, month, 1).getDay();
   const daysInMonth = new Date(CAL_YEAR, month + 1, 0).getDate();
   const selDay      = currentDate.startsWith(`${CAL_YEAR}-${String(month+1).padStart(2,'0')}`)
