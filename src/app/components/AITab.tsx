@@ -469,7 +469,8 @@ function OutfitResultCard({ outfit, saved, onSave, onAddToOutfit }: {
             date: getTodayDate(),
             style: outfit.tags[0] ?? 'Casual',
             label: outfit.label,
-            isCalendarOnly: true,
+            showInGrid: false,
+            showInCalendar: true,
             outfitItems: outfit.items.map((item, i) => ({
               id: `ai_${i}_${Date.now()}`,
               type: roleToType(item.role),
@@ -535,7 +536,8 @@ function SavedOutfitCard({ outfit, onNavigate }: { outfit: OutfitRecord; onNavig
             date: getTodayDate(),
             style: outfit.tags[0] ?? 'Casual',
             label: outfit.label,
-            isCalendarOnly: true,
+            showInGrid: false,
+            showInCalendar: true,
             outfitItems: outfit.items.map((item, i) => ({
               id: `ai_${i}_${Date.now()}`,
               type: roleToType(item.role),
@@ -607,6 +609,8 @@ export default function AITab({ onNavigate }: { onNavigate: (tab: string) => voi
       date: getTodayDate(),
       style: outfit.tags[0] ?? 'Casual',
       label: outfit.label,
+      showInGrid: true,
+      showInCalendar: false,
       outfitItems: outfit.items.map((item, i) => ({
         id: `ai_${i}_${Date.now()}`,
         type: roleToType(item.role),
@@ -626,6 +630,8 @@ export default function AITab({ onNavigate }: { onNavigate: (tab: string) => voi
       date: getTodayDate(),
       style: outfit.tags[0] ?? 'Casual',
       label: outfit.label,
+      showInGrid: true,
+      showInCalendar: false,
       outfitItems: outfit.items.map((item, i) => ({
         id: `suggest_${i}_${Date.now()}`,
         type: roleToType(item.role),

@@ -59,6 +59,8 @@ setInitialOutfits([
     label: '2 May Outfit',
     mannequinImage: mannequin_may2,
     avatarImage: avatar_may2,
+    showInGrid: true,
+    showInCalendar: true,
     outfitItems: [_c023, _c008, _c011, _c024].filter(Boolean).map(i => toSavedItem(i!)),
   },
   {
@@ -68,6 +70,8 @@ setInitialOutfits([
     label: '6 May Outfit',
     mannequinImage: mannequin_may6,
     avatarImage: avatar_may6,
+    showInGrid: true,
+    showInCalendar: true,
     outfitItems: [_c004, _c020, _c010].filter(Boolean).map(i => toSavedItem(i!)),
   },
   {
@@ -77,6 +81,8 @@ setInitialOutfits([
     label: '9 May Outfit',
     mannequinImage: mannequin_may9,
     avatarImage: avatar_may9,
+    showInGrid: true,
+    showInCalendar: true,
     outfitItems: [_c003, _c022, _c021, _c012, _c017].filter(Boolean).map(i => toSavedItem(i!)),
   },
 ]);
@@ -2572,10 +2578,12 @@ export default function OutfitTab() {
     setView('create');
   }
 
-  function handleSaveOutfit(items: CanvasItem[], date: string, style: string, name: string, mannequinImage?: string, avatarImage?: string, isCalendarOnly?: boolean) {
+  function handleSaveOutfit(items: CanvasItem[], date: string, style: string, name: string, mannequinImage?: string, avatarImage?: string, addToCalendar?: boolean) {
     const newId = `O${Date.now()}`;
     addOutfit({ id:newId, date, style, label: name || 'Untitled Outfit',
-      mannequinImage, avatarImage, isCalendarOnly,
+      mannequinImage, avatarImage,
+      showInGrid: !addToCalendar,
+      showInCalendar: addToCalendar === true,
       outfitItems: items.map(c => c.item) });
 
     if (pendingSlotAssign) {
@@ -2654,7 +2662,7 @@ export default function OutfitTab() {
           const todayDate = getTodayDate();
           const alreadyAdded = savedOutfits.some(o =>
             o.date === todayDate &&
-            o.isCalendarOnly &&
+            o.showInCalendar === true &&
             o.outfitItems.length === selectedOutfit.outfitItems.length &&
             o.outfitItems.every((item, i) => item.id === selectedOutfit.outfitItems[i]?.id)
           );
@@ -2671,7 +2679,8 @@ export default function OutfitTab() {
             label: selectedOutfit.label,
             mannequinImage: selectedOutfit.mannequinImage,
             avatarImage: selectedOutfit.avatarImage,
-            isCalendarOnly: true,
+            showInGrid: false,
+            showInCalendar: true,
             outfitItems: selectedOutfit.outfitItems,
           });
           toast.success("Outfit added to today's calendar");
@@ -2701,7 +2710,7 @@ export default function OutfitTab() {
   );
 
   /* ── Records view ──────────────────────────────────────────────── */
-  const filtered       = savedOutfits.filter(o => !o.isCalendarOnly && (filterStyle==='All' || o.style===filterStyle));
+  const filtered       = savedOutfits.filter(o => o.showInGrid === true && (filterStyle==='All' || o.style===filterStyle));
   const MONTH_NAMES    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const firstDayOfMon  = new Date(CAL_YEAR, calMonth, 1).getDay();
   const daysInMonth    = new Date(CAL_YEAR, calMonth + 1, 0).getDate();
@@ -2709,7 +2718,24 @@ export default function OutfitTab() {
 
   function getDayOutfits(day: number): OutfitRecord[] {
     const ds = `${CAL_YEAR}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    return savedOutfits.filter(o => o.date === ds && o.isCalendarOnly);
+
+    // Existing: outfits with showInCalendar === true on this date
+    const fromStore = savedOutfits.filter(o =>
+      o.date === ds && o.showInCalendar === true
+    );
+
+    // Always include preset outfits on their assigned demo dates
+    const PRESET_DEMO_DATES = ['2026-05-02', '2026-05-06', '2026-05-09'];
+    if (PRESET_DEMO_DATES.includes(ds)) {
+      const preset = savedOutfits.find(o =>
+        (o.id === 'O001' || o.id === 'O002' || o.id === 'O003') && o.date === ds
+      );
+      if (preset && !fromStore.find(x => x.id === preset.id)) {
+        return [...fromStore, preset];
+      }
+    }
+
+    return fromStore;
   }
 
   const calSelectedDate    = `${CAL_YEAR}-${String(calMonth+1).padStart(2,'0')}-${String(calDay).padStart(2,'0')}`;

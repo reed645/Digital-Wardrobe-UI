@@ -257,8 +257,8 @@ function ItemEditForm({ initial, onSave, onBack, title='AI Detected', itemImage 
 }
 
 /* ─── Item detail page ───────────────────────────────────────────── */
-function ItemDetailView({ item, onBack, onEdit, onMarkWorn, onAddToOutfit, forceLongAgo }: {
-  item:ClothingItem; onBack:()=>void; onEdit:()=>void; onMarkWorn:()=>void; onAddToOutfit:()=>void; forceLongAgo?:boolean;
+function ItemDetailView({ item, onBack, onEdit, onMarkWorn, forceLongAgo }: {
+  item:ClothingItem; onBack:()=>void; onEdit:()=>void; onMarkWorn:()=>void; forceLongAgo?:boolean;
 }) {
   const todayStr = getTodayDate();
   const getLastWornText = () => {
@@ -343,9 +343,8 @@ function ItemDetailView({ item, onBack, onEdit, onMarkWorn, onAddToOutfit, force
             <p style={{fontSize:13,color:'#1a1560',lineHeight:1.6}}>{item.comment}</p>
           </div>
         )}
-        <div className="space-y-2.5">
-          <button onClick={onAddToOutfit} className="w-full h-11 rounded-full font-semibold text-sm text-white" style={{background:'#3D35A8'}}>Add to Outfit</button>
-          <button onClick={onMarkWorn} className="w-full h-11 rounded-full font-semibold text-sm" style={{background:'white',border:CARD_BORDER,color:'#7F77DD'}}>Mark as Worn Today</button>
+        <div className="mt-4">
+          <button onClick={onMarkWorn} className="w-full h-11 rounded-full font-semibold text-sm text-white" style={{background:'#3D35A8'}}>Mark as Worn Today</button>
         </div>
       </div>
     </div>
@@ -565,9 +564,6 @@ export default function ClothesTab() {
           onEdit={()=>setEditingItemId(selectedItem.id)}
           onMarkWorn={() => {
             markAsWorn(selectedItem.id, getTodayDate());
-            toast.success("Marked as worn today");
-          }}
-          onAddToOutfit={() => {
             const outfitItem: SavedOutfitItem = {
               id: selectedItem.id,
               type: selectedItem.type,
@@ -578,7 +574,7 @@ export default function ClothesTab() {
               name: selectedItem.name,
             };
             addItemToTodayOutfit(outfitItem, getTodayDate());
-            toast.success("Added to outfit");
+            toast.success("Marked as worn today");
           }}
           forceLongAgo={idleItemIds.has(selectedItem.id)}/>
       )}

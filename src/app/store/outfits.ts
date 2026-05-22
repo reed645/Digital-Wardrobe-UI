@@ -18,7 +18,9 @@ export interface OutfitRecord {
   mannequinImage?: string; // full outfit photo → main Grid card preview
   avatarImage?: string;    // pixel avatar photo → Calendar date cell preview
   outfitItems: SavedOutfitItem[];
-  isCalendarOnly?: boolean; // if true, only shows in Calendar, not in Grid
+  showInGrid?: boolean;
+  showInCalendar?: boolean;
+  isWornBucket?: boolean;
 }
 
 let records: OutfitRecord[] = [];
@@ -56,20 +58,23 @@ export function getOutfitByDate(date: string): OutfitRecord | undefined {
 
 /* ─── Create or add to outfit ─────────────────────────────────────── */
 export function addItemToTodayOutfit(item: SavedOutfitItem, date: string): void {
-  const existingOutfit = records.find(r => r.date === date);
-  
-  if (existingOutfit) {
-    // Add to existing outfit if not already present
-    if (!existingOutfit.outfitItems.some(i => i.id === item.id)) {
-      addItemToOutfit(existingOutfit.id, item);
+  const existingBucket = records.find(r => r.date === date && r.isWornBucket === true);
+
+  if (existingBucket) {
+    // Add to existing worn bucket if not already present
+    if (!existingBucket.outfitItems.some(i => i.id === item.id)) {
+      addItemToOutfit(existingBucket.id, item);
     }
   } else {
-    // Create new outfit for the date
+    // Create new worn bucket for the date
     const newOutfit: OutfitRecord = {
-      id: `user_${Date.now()}`,
+      id: `WB${Date.now()}`,
       date: date,
       style: 'Casual',
-      label: 'My Outfit',
+      label: 'Worn today',
+      isWornBucket: true,
+      showInGrid: false,
+      showInCalendar: true,
       outfitItems: [item],
     };
     addOutfit(newOutfit);
