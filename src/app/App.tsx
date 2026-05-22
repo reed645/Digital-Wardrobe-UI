@@ -29,7 +29,7 @@ export default function App() {
 
   return (
     <>
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" richColors closeButton style={{ maxWidth: '100%' }} />
       <div className="phone-app-layout">
         <div className="phone-app-content">
           {renderActiveTab()}

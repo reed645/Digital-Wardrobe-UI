@@ -18,6 +18,7 @@ export interface OutfitRecord {
   mannequinImage?: string; // full outfit photo → main Grid card preview
   avatarImage?: string;    // pixel avatar photo → Calendar date cell preview
   outfitItems: SavedOutfitItem[];
+  isCalendarOnly?: boolean; // if true, only shows in Calendar, not in Grid
 }
 
 let records: OutfitRecord[] = [];

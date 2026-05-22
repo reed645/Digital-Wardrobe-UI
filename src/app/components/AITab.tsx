@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { getStyles, subscribeStyles } from '../store/styleTags';
 import { ClothingItem, getItems, getIdleItems, getRecentItems, subscribeWardrobe } from '../store/wardrobe';
 import { addOutfit, getOutfits, subscribeOutfits, OutfitRecord } from '../store/outfits';
-import { getColorTones, getColorPalette } from '../../data/index';
+import { getColorTones, getColorPalette, getTodayDate } from '../../data/index';
 
 /* ─── Shared tokens ──────────────────────────────────────────────── */
 const PAGE_BG    = '#F8F7FF';
@@ -463,7 +463,25 @@ function OutfitResultCard({ outfit, saved, onSave, onAddToOutfit }: {
         ))}
       </div>
       <div className="px-4 pb-4 flex gap-2">
-        <button onClick={() => toast.success("Outfit recorded for today")} className="flex-1 h-9 rounded-full font-semibold text-sm text-white" style={{ background: '#3D35A8' }}>
+        <button onClick={() => {
+          addOutfit({
+            id: `ai_cal_${Date.now()}`,
+            date: getTodayDate(),
+            style: outfit.tags[0] ?? 'Casual',
+            label: outfit.label,
+            isCalendarOnly: true,
+            outfitItems: outfit.items.map((item, i) => ({
+              id: `ai_${i}_${Date.now()}`,
+              type: roleToType(item.role),
+              emoji: item.emoji,
+              color: item.name ?? item.role,
+              colorHex: item.colorHex,
+              image: item.image,
+              name: item.name,
+            })),
+          });
+          toast.success("Outfit recorded for today");
+        }} className="flex-1 h-9 rounded-full font-semibold text-sm text-white" style={{ background: '#3D35A8' }}>
           Wear Today
         </button>
         <button onClick={onAddToOutfit}
@@ -511,7 +529,26 @@ function SavedOutfitCard({ outfit, onNavigate }: { outfit: OutfitRecord; onNavig
         </div>
       </div>
       <div className="px-3 pb-3">
-        <button onClick={() => { toast.success("Outfit recorded for today"); onNavigate('outfit'); }}
+        <button onClick={() => {
+          addOutfit({
+            id: `ai_cal_${Date.now()}`,
+            date: getTodayDate(),
+            style: outfit.tags[0] ?? 'Casual',
+            label: outfit.label,
+            isCalendarOnly: true,
+            outfitItems: outfit.items.map((item, i) => ({
+              id: `ai_${i}_${Date.now()}`,
+              type: roleToType(item.role),
+              emoji: item.emoji,
+              color: item.name ?? item.role,
+              colorHex: item.colorHex,
+              image: item.image,
+              name: item.name,
+            })),
+          });
+          toast.success("Outfit recorded for today");
+          onNavigate('outfit');
+        }}
           className="w-full h-10 rounded-full font-semibold text-sm text-white flex items-center justify-center gap-1.5"
           style={{ background:'#3D35A8' }}>
           <Check size={13}/> Wear Today
@@ -567,7 +604,7 @@ export default function AITab({ onNavigate }: { onNavigate: (tab: string) => voi
   function handleAddToOutfit(outfit: OutfitCard) {
     addOutfit({
       id: Date.now().toString(),
-      date: new Date().toISOString().split('T')[0],
+      date: getTodayDate(),
       style: outfit.tags[0] ?? 'Casual',
       label: outfit.label,
       outfitItems: outfit.items.map((item, i) => ({
@@ -586,7 +623,7 @@ export default function AITab({ onNavigate }: { onNavigate: (tab: string) => voi
   function handleSuggestSave(outfit: SuggestOutfit) {
     addOutfit({
       id: Date.now().toString(),
-      date: new Date().toISOString().split('T')[0],
+      date: getTodayDate(),
       style: outfit.tags[0] ?? 'Casual',
       label: outfit.label,
       outfitItems: outfit.items.map((item, i) => ({

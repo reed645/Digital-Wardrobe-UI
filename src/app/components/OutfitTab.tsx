@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Calendar, CalendarDays, Plus, Minus, Sparkles, X, Check, ChevronLeft, ChevronRight, MoreHorizontal, Camera, Folders, BookmarkPlus, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { getItems, subscribeWardrobe, getItemByClosetId, ClothingItem } from '../store/wardrobe';
 import { getStyles, subscribeStyles } from '../store/styleTags';
 import {
@@ -145,23 +146,6 @@ function formatBarDate(d: string): string {
   if (d === TODAY_STR) return `Today, ${new Date(TODAY_STR + 'T12:00:00').getDate()} ${MONTH_NAMES[new Date(TODAY_STR + 'T12:00:00').getMonth()]}`;
   if (d === YESTERDAY) return `Yesterday, ${new Date(YESTERDAY + 'T12:00:00').getDate()} ${MONTH_NAMES[new Date(YESTERDAY + 'T12:00:00').getMonth()]}`;
   return formatDate(d);
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   ToastBanner
-═══════════════════════════════════════════════════════════════════ */
-function ToastBanner({ message }: { message: string }) {
-  return (
-    <div style={{
-      position:'fixed', left:16, right:16, top:56, zIndex:9999,
-      background:'#1A1A40', borderRadius:16, padding:'12px 16px',
-      display:'flex', alignItems:'center', gap:12,
-      boxShadow:'0 8px 32px rgba(0,0,0,0.3)',
-    }}>
-      <Check size={18} color="#22C55E"/>
-      <p style={{ fontSize:13, fontWeight:600, color:'white', ...DM }}>{message}</p>
-    </div>
-  );
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -707,10 +691,11 @@ const DEMO_TRYON = [
    TryOnView — virtual try-on screen
    Uses pre-prepared demo assets to simulate AI outfit generation.
 ═══════════════════════════════════════════════════════════════════ */
-function TryOnView({ canvasItems, onBack, onSave }: {
+function TryOnView({ canvasItems, onBack, onSave, onAddToCalendar }: {
   canvasItems: CanvasItem[];
   onBack: () => void;
   onSave: (mannequinImage: string, avatarImage: string) => void;
+  onAddToCalendar: (mannequinImage: string, avatarImage: string) => void;
 }) {
   const [phase, setPhase] = useState<'loading'|'result'>('loading');
   const [peekedItem, setPeekedItem] = useState<SavedOutfitItem|null>(null);
@@ -822,13 +807,13 @@ function TryOnView({ canvasItems, onBack, onSave }: {
 
         {/* Add to Outfit Records CTA */}
         <div className="px-4">
-          <button onClick={() => onSave(demo.mannequin, demo.avatar)}
+          <button onClick={() => onAddToCalendar(demo.mannequin, demo.avatar)}
             className="w-full h-13 rounded-full font-semibold text-sm text-white flex items-center justify-center gap-2"
             style={{ background:'#1A1A40', height:52 }}>
             <Check size={16}/> Add to Outfit Records
           </button>
           <p style={{ fontSize:10, color:'#AFA9EC', textAlign:'center', marginTop:8 }}>
-            Outfit will appear in Grid and Calendar
+            Outfit will appear in Calendar only
           </p>
         </div>
       </div>
@@ -894,7 +879,10 @@ function CreateOutfitView({
   if (showTryOn) return (
     <TryOnView canvasItems={canvasItems} onBack={() => setShowTryOn(false)}
       onSave={(mannequin, avatar) => {
-        if (canSave) onSave(canvasItems, saveDate, saveStyle, saveName, mannequin, avatar);
+        if (canSave) onSave(canvasItems, saveDate, saveStyle, saveName, mannequin, avatar, false);
+      }}
+      onAddToCalendar={(mannequin, avatar) => {
+        if (canSave) onSave(canvasItems, saveDate, saveStyle, saveName, mannequin, avatar, true);
       }}/>
   );
 
@@ -1077,8 +1065,8 @@ function CalendarOutfitCard({ outfit, onTap, onItemTap }: { outfit: OutfitRecord
    OutfitDetailView — tapping an outfit card opens this
 ═══════════════════════════════════════════════════════════════════ */
 function OutfitDetailView({
-  outfit, onBack, onEdit, onAddToCollection,
-}: { outfit: OutfitRecord; onBack: () => void; onEdit: () => void; onAddToCollection?: () => void }) {
+  outfit, onBack, onEdit, onWearToday,
+}: { outfit: OutfitRecord; onBack: () => void; onEdit: () => void; onWearToday: () => void }) {
   const [peekedItem, setPeekedItem] = useState<SavedOutfitItem|null>(null);
   return (
     <div className="h-full overflow-y-auto pb-10 relative" style={{ background:PAGE_BG, ...DM }}>
@@ -1153,14 +1141,12 @@ function OutfitDetailView({
             style={{ background:'#3D35A8', color:'white' }}>
             Edit Outfit
           </button>
-          {onAddToCollection && (
-            <button onClick={onAddToCollection}
-              className="h-12 px-4 rounded-full font-semibold text-sm flex items-center justify-center gap-1.5"
-              style={{ background:'#EDE9FE', color:'#3D35A8', border:CARD_BORDER }}>
-              <BookmarkPlus size={15}/> Collect
-            </button>
-          )}
         </div>
+        <button onClick={onWearToday}
+          className="w-full h-11 rounded-full font-semibold text-sm flex items-center justify-center gap-2 mt-2"
+          style={{ background:'#F0EEFF', color:'#3D35A8', border:CARD_BORDER }}>
+          <Check size={14}/> Wear Today
+        </button>
       </div>
 
       {peekedItem && <ClosetItemSheet item={peekedItem} onClose={() => setPeekedItem(null)}/>}
@@ -2508,7 +2494,6 @@ export default function OutfitTab() {
   const [planDraftKey,       setPlanDraftKey]       = useState(0);
   const [pendingSlotAssign,  setPendingSlotAssign]  = useState<{slotIdx:number; source:'planCreate'|'planDetail'; slotDate?:string}|null>(null);
   const [createFromDate,     setCreateFromDate]     = useState<string|undefined>();
-  const [toastMsg,           setToastMsg]           = useState<string|null>(null);
   const [peekedItem,         setPeekedItem]         = useState<SavedOutfitItem|null>(null);
   const [addToColOutfit,     setAddToColOutfit]     = useState<OutfitRecord|null>(null);
   const [wardrobeItems,      setWardrobeItems]      = useState<WardrobeItem[]>(() =>
@@ -2524,10 +2509,6 @@ export default function OutfitTab() {
       colorHex:i.colorHex, image:i.image, name:i.name })))
   ), []);
 
-  function showToast(msg: string) {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 2500);
-  }
   function openCreate(fromDate?: string) { setCreateFromDate(fromDate); setView('create'); }
   function openDetail(outfit: OutfitRecord) { setSelectedOutfit(outfit); setView('detail'); }
   function openEdit(outfit: OutfitRecord)   { setSelectedOutfit(outfit); setView('edit'); }
@@ -2538,42 +2519,42 @@ export default function OutfitTab() {
   function handleSaveCollection(data: Omit<OutfitCollection,'id'>) {
     addCollection({ id:`COL${Date.now()}`, ...data });
     setCollectionSubView('list');
-    showToast('Collection saved');
+    toast.success('Collection saved');
   }
   function handleUpdateCollection(updated: OutfitCollection) {
     updateCollection(updated);
     setSelectedCollection(updated);
     setCollectionSubView('detail');
-    showToast('Collection updated');
+    toast.success('Collection updated');
   }
   function handleDeleteCollection() {
     if (selectedCollection) { deleteCollection(selectedCollection.id); }
     setSelectedCollection(null);
     setCollectionSubView('list');
-    showToast('Collection deleted');
+    toast.success('Collection deleted');
   }
   function handleAddToCollection(colId: string) {
     if (addToColOutfit) { addOutfitToCollection(colId, addToColOutfit.id); }
     setAddToColOutfit(null);
-    showToast('Added to collection');
+    toast.success('Added to collection');
   }
 
   function handleSavePlan(data: Omit<OutfitPlan,'id'>) {
     addPlan({ id:`PLN${Date.now()}`, ...data });
     setPlanSubView('list');
-    showToast('Outfit plan saved');
+    toast.success('Outfit plan saved');
   }
   function handleUpdatePlan(updated: OutfitPlan) {
     updatePlan(updated);
     setSelectedPlan(updated);
     setPlanSubView('detail');
-    showToast('Plan updated');
+    toast.success('Plan updated');
   }
   function handleDeletePlan() {
     if (selectedPlan) deletePlan(selectedPlan.id);
     setSelectedPlan(null);
     setPlanSubView('list');
-    showToast('Plan deleted');
+    toast.success('Plan deleted');
   }
   function handlePlanSlotUpdate(updated: OutfitPlan) {
     updatePlan(updated);
@@ -2591,10 +2572,10 @@ export default function OutfitTab() {
     setView('create');
   }
 
-  function handleSaveOutfit(items: CanvasItem[], date: string, style: string, name: string, mannequinImage?: string, avatarImage?: string) {
+  function handleSaveOutfit(items: CanvasItem[], date: string, style: string, name: string, mannequinImage?: string, avatarImage?: string, isCalendarOnly?: boolean) {
     const newId = `O${Date.now()}`;
     addOutfit({ id:newId, date, style, label: name || 'Untitled Outfit',
-      mannequinImage, avatarImage,
+      mannequinImage, avatarImage, isCalendarOnly,
       outfitItems: items.map(c => c.item) });
 
     if (pendingSlotAssign) {
@@ -2611,7 +2592,7 @@ export default function OutfitTab() {
         setCreateFromDate(undefined);
         setView('records');
         setPlanSubView('detail');
-        showToast('Outfit created and added to plan day');
+        toast.success('Outfit created and added to plan day');
       } else if (source === 'planCreate' && planDraft) {
         const updatedSlots = planDraft.planDaySlots.map((s, i) =>
           i === slotIdx && s.outfitIds.length < 3 && !s.outfitIds.includes(newId)
@@ -2624,23 +2605,23 @@ export default function OutfitTab() {
         setCreateFromDate(undefined);
         setView('records');
         setPlanSubView('create');
-        showToast('Outfit created and added to plan day');
+        toast.success('Outfit created and added to plan day');
       }
     } else {
       setCreateFromDate(undefined);
       setView('records');
-      showToast('Outfit saved');
+      toast.success('Outfit saved');
     }
   }
   function handleEditSaved(updated: OutfitRecord) {
     setSelectedOutfit(updated);
     setView('detail');
-    showToast('Outfit updated');
+    toast.success('Outfit updated');
   }
   function handleDeleted() {
     setSelectedOutfit(null);
     setView('records');
-    showToast('Outfit deleted');
+    toast.success('Outfit deleted');
   }
 
   /* ── Sub-views ─────────────────────────────────────────────────── */
@@ -2660,7 +2641,6 @@ export default function OutfitTab() {
         wardrobe={wardrobeItems}
         initialDate={createFromDate}
       />
-      {toastMsg && <ToastBanner message={toastMsg}/>}
     </div>
   );
 
@@ -2670,9 +2650,33 @@ export default function OutfitTab() {
         outfit={selectedOutfit}
         onBack={() => { setView('records'); }}
         onEdit={() => openEdit(selectedOutfit)}
-        onAddToCollection={() => setAddToColOutfit(selectedOutfit)}
+        onWearToday={() => {
+          const todayDate = getTodayDate();
+          const alreadyAdded = savedOutfits.some(o =>
+            o.date === todayDate &&
+            o.isCalendarOnly &&
+            o.outfitItems.length === selectedOutfit.outfitItems.length &&
+            o.outfitItems.every((item, i) => item.id === selectedOutfit.outfitItems[i]?.id)
+          );
+
+          if (alreadyAdded) {
+            toast.info("Already added to today's calendar");
+            return;
+          }
+
+          addOutfit({
+            id: `O${Date.now()}`,
+            date: todayDate,
+            style: selectedOutfit.style,
+            label: selectedOutfit.label,
+            mannequinImage: selectedOutfit.mannequinImage,
+            avatarImage: selectedOutfit.avatarImage,
+            isCalendarOnly: true,
+            outfitItems: selectedOutfit.outfitItems,
+          });
+          toast.success("Outfit added to today's calendar");
+        }}
       />
-      {toastMsg && <ToastBanner message={toastMsg}/>}
       {addToColOutfit && (
         <AddToCollectionSheet
           outfit={addToColOutfit} collections={collections}
@@ -2693,12 +2697,11 @@ export default function OutfitTab() {
         onSaved={handleEditSaved}
         onDeleted={handleDeleted}
       />
-      {toastMsg && <ToastBanner message={toastMsg}/>}
     </div>
   );
 
   /* ── Records view ──────────────────────────────────────────────── */
-  const filtered       = savedOutfits.filter(o => filterStyle==='All' || o.style===filterStyle);
+  const filtered       = savedOutfits.filter(o => !o.isCalendarOnly && (filterStyle==='All' || o.style===filterStyle));
   const MONTH_NAMES    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const firstDayOfMon  = new Date(CAL_YEAR, calMonth, 1).getDay();
   const daysInMonth    = new Date(CAL_YEAR, calMonth + 1, 0).getDate();
@@ -2706,7 +2709,7 @@ export default function OutfitTab() {
 
   function getDayOutfits(day: number): OutfitRecord[] {
     const ds = `${CAL_YEAR}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-    return savedOutfits.filter(o => o.date === ds);
+    return savedOutfits.filter(o => o.date === ds && o.isCalendarOnly);
   }
 
   const calSelectedDate    = `${CAL_YEAR}-${String(calMonth+1).padStart(2,'0')}-${String(calDay).padStart(2,'0')}`;
@@ -2868,7 +2871,6 @@ export default function OutfitTab() {
         <Plus size={28}/>
       </button>
 
-      {toastMsg && <ToastBanner message={toastMsg}/>}
       {peekedItem && <ClosetItemSheet item={peekedItem} onClose={() => setPeekedItem(null)}/>}
       {addToColOutfit && view === 'records' && (
         <AddToCollectionSheet
