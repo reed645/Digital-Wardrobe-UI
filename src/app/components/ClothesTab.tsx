@@ -564,16 +564,6 @@ export default function ClothesTab() {
           onEdit={()=>setEditingItemId(selectedItem.id)}
           onMarkWorn={() => {
             markAsWorn(selectedItem.id, getTodayDate());
-            const outfitItem: SavedOutfitItem = {
-              id: selectedItem.id,
-              type: selectedItem.type,
-              emoji: selectedItem.emoji,
-              color: selectedItem.color,
-              colorHex: selectedItem.colorHex,
-              image: selectedItem.image,
-              name: selectedItem.name,
-            };
-            addItemToTodayOutfit(outfitItem, getTodayDate());
             toast.success("Marked as worn today");
           }}
           forceLongAgo={idleItemIds.has(selectedItem.id)}/>
