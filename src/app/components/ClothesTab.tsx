@@ -5,8 +5,8 @@ import clothingPreview from '../../imports/image.png';
 import FilterSheet, { FilterState } from './FilterSheet';
 import { getStyles, addStyle, subscribeStyles } from '../store/styleTags';
 import { getItems, addItem as storeAddItem, updateItem as storeUpdateItem, removeItem as storeRemoveItem, subscribeWardrobe, getNextClosetId, ClothingItem, markAsWorn } from '../store/wardrobe';
-import { addItemToOutfit, addItemToTodayOutfit, SavedOutfitItem } from '../store/outfits';
-import { getCategories, getColorPalette, getSeasons, getTodayDate } from '../../data/index';
+import { addItemToOutfit, addItemToTodayOutfit, SavedOutfitItem, addOutfit } from '../store/outfits';
+import { getCategories, getColorPalette, getSeasons, getTodayDate, getImagePath } from '../../data/index';
 
 /* ─── Tokens ─────────────────────────────────────────────────────── */
 const PAGE_BG    = '#F8F7FF';
@@ -105,6 +105,120 @@ function ScanningView() {
         {steps.map((_,i)=>(
           <div key={i} style={{width:i===dot?20:6,height:6,borderRadius:999,background:i===dot?'#3D35A8':'#EEEDFE',transition:'all 0.3s'}}/>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Multi-item scan results view ────────────────────────────────── */
+const WARDROBE_LOOKUP: Record<string, { type: string; color: string; name: string; emoji: string; colorHex: string; image: string }> = {
+  'C023': { type: 'Top', color: 'Blue', name: 'Blue Sweater', emoji: '👕', colorHex: '#4A90D9', image: 'blue_sweater-1.png' },
+  'C008': { type: 'Bottom', color: 'Beige', name: 'Beige Trousers', emoji: '👖', colorHex: '#D4BFA0', image: 'pant.png' },
+  'C011': { type: 'Shoes', color: 'Black', name: 'Army Boots', emoji: '🥾', colorHex: '#1A1A1A', image: 'Black_army_Boots.png' },
+  'C024': { type: 'Accessories', color: 'Tan', name: 'Shopping Bag', emoji: '👜', colorHex: '#C8A96E', image: 'Shopping_Bag-1.png' },
+};
+
+const DETECTED_ITEMS = [
+  { id: 'scan_1', closetId: 'C023', ...WARDROBE_LOOKUP['C023'] },
+  { id: 'scan_2', closetId: 'C008', ...WARDROBE_LOOKUP['C008'] },
+  { id: 'scan_3', closetId: 'C011', ...WARDROBE_LOOKUP['C011'] },
+  { id: 'scan_4', closetId: 'C024', ...WARDROBE_LOOKUP['C024'] },
+];
+
+interface MultiItemScanViewProps {
+  onConfirm: (selectedIds: string[]) => void;
+  onCancel: () => void;
+}
+
+function MultiItemScanView({ onConfirm, onCancel }: MultiItemScanViewProps) {
+  const [selected, setSelected] = useState<Set<string>>(new Set(DETECTED_ITEMS.map(i => i.id)));
+
+  function toggle(id: string) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const count = selected.size;
+
+  return (
+    <div className="absolute inset-0 z-30 flex flex-col overflow-hidden" style={{ background: PAGE_BG, fontFamily: "'DM Sans',sans-serif" }}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-10 pb-4" style={{ borderBottom: CARD_BORDER, flexShrink: 0 }}>
+        <button onClick={onCancel} style={{ color: '#7F77DD', fontSize: 14 }}>Cancel</button>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: '#1a1560' }}>Detected Items</h2>
+        <div style={{ width: 60 }} />
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        <p style={{ fontSize: 14, color: '#AFA9EC', marginBottom: 16 }}>We found 4 items. Select which to add to your closet.</p>
+
+        <div className="space-y-3">
+          {DETECTED_ITEMS.map(item => {
+            const isSelected = selected.has(item.id);
+            const imgUrl = getImagePath(item.image);
+            return (
+              <button
+                key={item.id}
+                onClick={() => toggle(item.id)}
+                className="w-full flex items-center gap-3 rounded-2xl p-3 text-left"
+                style={{ background: isSelected ? '#F0EEFF' : 'white', border: CARD_BORDER }}
+              >
+                {/* Checkbox */}
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: isSelected ? '#3D35A8' : 'white',
+                    border: isSelected ? 'none' : '2px solid #AFA9EC'
+                  }}
+                >
+                  {isSelected && <Check size={13} color="white" strokeWidth={3} />}
+                </div>
+
+                {/* Image */}
+                <div
+                  className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0"
+                  style={{ background: '#F0EEFF' }}
+                >
+                  {imgUrl && <img src={imgUrl} alt={item.name} className="w-full h-full object-cover" />}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span style={{ fontSize: 10, fontWeight: 700, background: '#EEEDFE', color: '#3D35A8', borderRadius: 999, padding: '2px 8px' }}>
+                      {item.type}
+                    </span>
+                    <span style={{ fontSize: 10, color: '#AFA9EC' }}>{item.color}</span>
+                  </div>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: '#1a1560', marginTop: 4 }}>{item.name}</p>
+                </div>
+
+                {/* Color dot */}
+                <div
+                  className="w-6 h-6 rounded-full flex-shrink-0"
+                  style={{ background: item.colorHex, border: '2px solid white', boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
+                />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Bottom button */}
+      <div className="px-4 pb-8 pt-4" style={{ borderTop: CARD_BORDER, flexShrink: 0 }}>
+        <button
+          onClick={() => onConfirm(Array.from(selected))}
+          className="w-full h-12 rounded-full font-semibold text-sm text-white"
+          style={{ background: count > 0 ? '#3D35A8' : '#AFA9EC' }}
+          disabled={count === 0}
+        >
+          Add Selected ({count} {count === 1 ? 'item' : 'items'})
+        </button>
       </div>
     </div>
   );
@@ -352,7 +466,7 @@ function ItemDetailView({ item, onBack, onEdit, onMarkWorn, forceLongAgo }: {
 }
 
 /* ─── Main ClothesTab ────────────────────────────────────────────── */
-type AddStep = null | 'source' | 'preview' | 'scanning' | 'results';
+type AddStep = null | 'source' | 'preview' | 'scanning' | 'multiDetect' | 'multiConfirm' | 'results' | 'outfitPrompt';
 
 export default function ClothesTab() {
   const [allItems,       setAllItems]       = useState<ClothingItem[]>(getItems());
@@ -369,10 +483,15 @@ export default function ClothesTab() {
   const [editMode,       setEditMode]       = useState(false);
   const [selectedEditIds, setSelectedEditIds] = useState<Set<string>>(new Set());
 
+  /* Multi-item flow state */
+  const [multiSelectedIds, setMultiSelectedIds] = useState<string[]>([]);
+  const [multiConfirmIdx, setMultiConfirmIdx] = useState(0);
+  const [multiSavedItems, setMultiSavedItems] = useState<SavedOutfitItem[]>([]);
+
   /* Scanning timer */
   useEffect(()=>{
     if(addStep!=='scanning') return;
-    const t=setTimeout(()=>setAddStep('results'),2400);
+    const t=setTimeout(()=>setAddStep('multiDetect'),2400);
     return ()=>clearTimeout(t);
   },[addStep]);
 
@@ -550,10 +669,89 @@ export default function ClothesTab() {
       {addStep==='source'&&<SourceSheet onSelect={()=>setAddStep('preview')} onClose={()=>setAddStep(null)}/>}
       {addStep==='preview'&&<PhotoPreview onConfirm={()=>setAddStep('scanning')} onBack={()=>setAddStep('source')}/>}
       {addStep==='scanning'&&<ScanningView/>}
-      {addStep==='results'&&(
-        <ItemEditForm
-          initial={{category:'Outerwear',colorNames:['Beige'],styles:['Casual','Minimal'],seasons:['Spring','Autumn'],comment:''}}
-          onSave={handleSaveNewItem} onBack={()=>setAddStep('source')} title="AI Detected"/>
+      {addStep==='multiDetect'&&(
+        <MultiItemScanView
+          onConfirm={(ids) => {
+            setMultiSelectedIds(ids);
+            setMultiConfirmIdx(0);
+            setMultiSavedItems([]);
+            setAddStep('multiConfirm');
+          }}
+          onCancel={()=>setAddStep(null)}
+        />
+      )}
+      {addStep==='multiConfirm'&&multiConfirmIdx < multiSelectedIds.length&&(
+        (() => {
+          const itemId = multiSelectedIds[multiConfirmIdx];
+          const detectedItem = DETECTED_ITEMS.find(i => i.id === itemId)!;
+          return (
+            <ItemEditForm
+              key={`multi-${itemId}`}
+              initial={{
+                category: detectedItem.type,
+                colorNames: [detectedItem.color],
+                styles: ['Casual'],
+                seasons: ['Spring'],
+                comment: ''
+              }}
+              itemImage={getImagePath(detectedItem.image)}
+              onSave={(d) => {
+                const savedItem: SavedOutfitItem = {
+                  id: `scan_${detectedItem.closetId}`,
+                  type: d.category,
+                  emoji: detectedItem.emoji,
+                  color: d.colorNames[0] ?? detectedItem.color,
+                  colorHex: detectedItem.colorHex,
+                  image: detectedItem.image,
+                  name: `${d.category} ${d.colorNames[0] ?? ''}`.trim(),
+                };
+                setMultiSavedItems(prev => [...prev, savedItem]);
+                const nextIdx = multiConfirmIdx + 1;
+                if (nextIdx < multiSelectedIds.length) {
+                  setMultiConfirmIdx(nextIdx);
+                } else {
+                  setAddStep('outfitPrompt');
+                }
+              }}
+              onBack={() => setAddStep('multiDetect')}
+              title={`Confirm Item ${multiConfirmIdx + 1} of ${multiSelectedIds.length}`}
+            />
+          );
+        })()
+      )}
+      {addStep==='outfitPrompt'&&multiSavedItems.length > 0&&(
+        <div className="absolute inset-0 z-40 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <div className="w-80 rounded-2xl p-6 bg-white" style={{ fontFamily: "'DM Sans',sans-serif" }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1a1560', marginBottom: 8 }}>Add these as an outfit?</h3>
+            <p style={{ fontSize: 14, color: '#7F77DD', marginBottom: 20 }}>
+              You've added {multiSavedItems.length} items. Would you like to save them together as an outfit?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  toast.success("Items added to closet");
+                  setAddStep(null);
+                  setMultiSavedItems([]);
+                }}
+                className="flex-1 h-11 rounded-full font-semibold text-sm"
+                style={{ background: 'transparent', color: '#7F77DD' }}
+              >
+                Skip
+              </button>
+              <button
+                onClick={() => {
+                  toast.success("Outfit saved");
+                  setAddStep(null);
+                  setMultiSavedItems([]);
+                }}
+                className="flex-1 h-11 rounded-full font-semibold text-sm text-white"
+                style={{ background: '#3D35A8' }}
+              >
+                Save as outfit
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Item detail */}
