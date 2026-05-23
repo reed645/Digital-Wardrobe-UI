@@ -85,7 +85,7 @@ export default function ProfileTab() {
         </h1>
         <p style={{fontSize:13,color:'#7F77DD',marginTop:4}}>{userProfile.email}</p>
         <div className="flex gap-2.5 mt-4">
-          {['84 items','3 outfits','Jan 2026'].map(lbl=>(
+          {['24 items','3 outfits','Jan 2026'].map(lbl=>(
             <span key={lbl} style={{border:'1px solid #AFA9EC',borderRadius:999,
               padding:'5px 12px',fontSize:12,color:'#3D35A8',fontWeight:500,background:'white'}}>
               {lbl}
